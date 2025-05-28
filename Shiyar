@@ -1,0 +1,42 @@
+/* Flutter project skeleton for Rêbaz - Unified Transport & Booking App Supports multi-language (AR, EN, KU), role-based login, document upload. */
+
+// pubspec.yaml name: rebaz description: Unified transport booking app in Syria version: 0.1.0+1 publish_to: 'none'
+
+environment: sdk: ">=2.17.0 <3.0.0"
+
+dependencies: flutter: sdk: flutter cupertino_icons: ^1.0.2 google_maps_flutter: ^2.1.1 flutter_localizations: sdk: flutter intl: ^0.17.0 provider: ^6.0.3 firebase_core: ^2.3.0 firebase_auth: ^4.1.0 cloud_firestore: ^4.0.3 firebase_storage: ^11.0.3 image_picker: ^0.8.5+3 file_picker: ^5.0.1
+
+assets and localization
+
+dart: assets: - assets/translations/ generate: true
+
+
+---
+
+// lib/main.dart import 'package:flutter/material.dart'; import 'package:flutter_localizations/flutter_localizations.dart'; import 'package:provider/provider.dart'; import 'localization/app_localizations.dart'; import 'screens/role_selection.dart'; import 'services/firebase_service.dart';
+
+void main() async { WidgetsFlutterBinding.ensureInitialized(); await FirebaseService.init(); runApp(MyApp()); }
+
+class MyApp extends StatelessWidget { @override Widget build(BuildContext context) { return ChangeNotifierProvider( create: (_) => AuthProvider(), child: Consumer<AuthProvider>( builder: (context, auth, _) { return MaterialApp( locale: auth.locale, supportedLocales: AppLocalizations.supportedLocales, localizationsDelegates: [ AppLocalizations.delegate, GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate, ], home: RoleSelectionScreen(), ); }, ), ); } }
+
+
+---
+
+// lib/localization/app_localizations.dart import 'dart:async'; import 'package:flutter/material.dart'; import 'package:intl/intl.dart'; import 'package:flutter/services.dart';
+
+class AppLocalizations { final Locale locale; AppLocalizations(this.locale);
+
+static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate(); static const supportedLocales = [ Locale('ar'), Locale('en'), Locale('ku'), ];
+
+static Future<AppLocalizations> load(Locale locale) async { final name = locale.languageCode; final data = await rootBundle.loadString('assets/translations/$name.json'); return AppLocalizations(locale); }
+
+String translate(String key) { return Intl.message(key, name: key, locale: locale.toString()); } }
+
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> { const _AppLocalizationsDelegate(); @override bool isSupported(Locale locale) => ['ar', 'en', 'ku'].contains(locale.languageCode); @override Future<AppLocalizations> load(Locale locale) => AppLocalizations.load(locale); @override bool shouldReload(_AppLocalizationsDelegate old) => false; }
+
+
+---
+
+// lib/screens/role_selection.dart import 'package:flutter/material.dart';
+
+class RoleSelectionScreen extends StatelessWidget { @override Widget build(BuildContext context) { return Scaffold( appBar: AppBar(title: Text('Rêbaz
